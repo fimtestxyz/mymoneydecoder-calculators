@@ -139,19 +139,19 @@ CI: `.github/workflows/ci.yml` runs `node --check` on all JS + `node
 cannot write workflows).
 
 ## 7. Acceptance criteria (v1.0 done = all true)
-- [ ] All 5 live pages render; every input recalculates instantly.
-- [ ] Net Worth math: worked example verified by test (cash 50k, inv 200k,
+- [x] All 5 live pages render; every input recalculates instantly.
+- [x] Net Worth math: worked example verified by test (cash 50k, inv 200k,
   CPF 150k, property 800k, mortgage 400k, other 20k → total 780k,
   investable 250k, liquid 50k, debt-to-asset 35%).
-- [ ] Passive Income: S$2m @ 8% → S$160,000/yr, S$13,333/mo (test).
-- [ ] FIRE: expenses S$60k/yr, 4% rule → FIRE number S$1.5m (test);
+- [x] Passive Income: S$2m @ 8% → S$160,000/yr, S$13,333/mo (test).
+- [x] FIRE: expenses S$60k/yr, 4% rule → FIRE number S$1.5m (test);
   projection reaches it and earliest FIRE age is sensible (test).
-- [ ] Assessment: the brief's S$3m example → persona C (The Affluent
+- [x] Assessment: the brief's S$3m example → persona C (The Affluent
   Professional) with the three named recommendations (FIRE, Passive Income,
   Mortgage vs Invest) (test).
-- [ ] Shared model: entering a portfolio value in one calculator pre-fills
+- [x] Shared model: entering a portfolio value in one calculator pre-fills
   it in the others (manual check); opt-in off by default; Clear my data
   wipes localStorage.
-- [ ] Live E2E on the deployed URL: assessment completes, all three
+- [x] Live E2E on the deployed URL: assessment completes, all three
   calculators produce results, report page aggregates.
-- [ ] No console errors on any page; mobile layout usable.
+- [x] No console errors on any page; mobile layout usable.
