@@ -7,7 +7,7 @@ Calculators built around six permanent brand pillars — Wealth Foundations,
 Wealth Building, FIRE & Freedom, Wealth Optimisation, Wealth Preservation,
 Life & Money.
 
-Live site: https://mymoneydecoder.vercel.app (after first deploy)
+Live site: https://mymoneydecoder-calculators.vercel.app
 
 ## Launch suite (v1.0)
 
