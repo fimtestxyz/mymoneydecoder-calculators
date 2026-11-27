@@ -124,24 +124,31 @@
       '<p class="empty-note">No portfolio numbers yet.</p><p><a href="passive-income.html">Open the Passive Income Calculator →</a></p>';
   }
 
-  // FIRE progress
+  // FIRE progress — use the same flavour the user picked in the FIRE
+  // Planner (stored as fireMode), not a hardcoded Traditional.
   if (has('annualExpenses') && has('portfolioValue')) {
+    var MODE_LABEL = { lean: 'Lean FIRE', coast: 'Coast FIRE', barista: 'Barista FIRE',
+      traditional: 'Traditional FIRE', fat: 'Fat FIRE', income: 'Income-based FIRE' };
+    var fireMode = MMDApp.get('fireMode', 'traditional');
     var f = MMD.firePlan({
       age: MMDApp.get('age', 35),
+      targetAge: MMDApp.get('targetAge', 60),
       annualExpenses: MMDApp.get('annualExpenses', 0),
       portfolio: MMDApp.get('portfolioValue', 0),
       monthlySavings: MMDApp.get('monthlySavings', 0),
       realReturnPct: MMDApp.get('expectedReturn', 5),
       withdrawalRatePct: MMDApp.get('withdrawalRate', 4),
-      mode: 'traditional'
+      mode: fireMode,
+      partTimeMonthly: MMDApp.get('partTimeMonthly', 0),
+      targetMonthlyIncome: MMDApp.get('targetMonthlyIncome', 0)
     });
     var pctThere = f.fireNumber > 0 ? f.coverage : 0;
     document.getElementById('fire-body').innerHTML =
-      '<p class="big-number">' + MMDApp.fmtSGD(f.fireNumber) + ' <small>your FIRE number</small></p>' +
+      '<p class="big-number">' + MMDApp.fmtSGD(f.fireNumber) + ' <small>your FIRE number · ' + (MODE_LABEL[fireMode] || 'Traditional FIRE') + '</small></p>' +
       '<div class="result-grid"><div class="stat"><div class="k">There today</div><div class="v">' + MMDApp.fmtPct(pctThere, 0) + '</div></div>' +
       '<div class="stat"><div class="k">Earliest FIRE age</div><div class="v">' + (f.fireAge === null ? 'Not on this path' : 'Age ' + f.fireAge) + '</div></div>' +
       '<div class="stat"><div class="k">Freedom gap</div><div class="v">' + MMDApp.fmtSGD(f.freedomGap) + '</div></div></div>';
-    summary.push('FIRE number: ' + MMDApp.fmtSGD(f.fireNumber) + ' — ' +
+    summary.push('FIRE number (' + (MODE_LABEL[fireMode] || 'Traditional FIRE') + '): ' + MMDApp.fmtSGD(f.fireNumber) + ' — ' +
       MMDApp.fmtPct(pctThere, 0) + ' there, earliest age ' +
       (f.fireAge === null ? 'not on current path' : f.fireAge) +
       ', gap ' + MMDApp.fmtSGD(f.freedomGap));

@@ -120,7 +120,10 @@
 <script src="app.js"></script>
 <script>
 (function () {
-  var mode = 'traditional';
+  // The selected FIRE flavour is part of the shared model: the Wealth
+  // Report must use the same mode, and a reload must not silently
+  // revert to Traditional.
+  var mode = MMDApp.get('fireMode', 'traditional');
   var MODE_DESC = {
     lean: 'Lean FIRE: a simpler lifestyle — your portfolio must cover 70% of current spending.',
     coast: 'Coast FIRE: you already have enough that compounding alone gets you there by your target age — no more saving required.',
@@ -129,6 +132,15 @@
     fat: 'Fat FIRE: a premium lifestyle — your portfolio must cover 150% of current spending.',
     income: 'Income-based FIRE: forget expenses — set the monthly passive income you want, and we size the portfolio for it.'
   };
+  function applyMode() {
+    document.querySelectorAll('#mode-row .mode-btn').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+    });
+    document.getElementById('mode-desc').textContent = MODE_DESC[mode];
+    document.getElementById('field-target-age').hidden = mode !== 'coast';
+    document.getElementById('field-parttime').hidden = mode !== 'barista';
+    document.getElementById('field-target-income').hidden = mode !== 'income';
+  }
   function recalc() {
     var r = MMD.firePlan({
       age: MMDApp.readNumber('in-age'),
@@ -181,13 +193,9 @@
   }
   document.querySelectorAll('#mode-row .mode-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      document.querySelectorAll('#mode-row .mode-btn').forEach(function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
       mode = btn.getAttribute('data-mode');
-      document.getElementById('mode-desc').textContent = MODE_DESC[mode];
-      document.getElementById('field-target-age').hidden = mode !== 'coast';
-      document.getElementById('field-parttime').hidden = mode !== 'barista';
-      document.getElementById('field-target-income').hidden = mode !== 'income';
+      MMDApp.set('fireMode', mode);
+      applyMode();
       recalc();
     });
   });
@@ -205,6 +213,7 @@
     adv.hidden = !adv.hidden;
     this.textContent = adv.hidden ? '+ Advanced assumptions' : '− Advanced assumptions';
   });
+  applyMode();
   recalc();
 })();
 </script>

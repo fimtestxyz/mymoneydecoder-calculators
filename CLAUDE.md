@@ -11,6 +11,11 @@ Static site, no build step, no backend, no dependencies.
   - Store: sessionStorage key `mmd-shared-v1` (shared across pages in one
     tab, gone on close). localStorage copy ONLY when the user opts in via
     "Remember my inputs". `Clear my data` wipes both.
+  - `bindNumber` saves the displayed value on bind, not only on typing:
+    the report must see a calculator's numbers even if the user only
+    looked at it. Empty inputs are never saved (a 0 would wipe a value
+    another calculator stored). The selected FIRE mode is stored as
+    `fireMode` and the report recomputes with it, never hardcoded.
   - Never persist anything without consent. Never send numbers anywhere.
 - One HTML file per calculator, same four-part structure: inputs →
   assumptions → results → insights, plus a methodology box.
@@ -38,7 +43,7 @@ Static site, no build step, no backend, no dependencies.
   `fimtestxyz/mymoneydecoder` — that is a different project (bank interest
   rate event pipeline, private, 7 commits) and must be left untouched.
 - Verify remote head with `list_commits` before pushing; append to
-  `~/workspace/mymoneydecoder.muse-github-snapshot-sync.json` after.
+  `~/workspace/mymoneydecoder-calculators.muse-github-snapshot-sync.json` after.
 - The App cannot write `.github/workflows/` (403, whole batch fails) and
   cannot create repos or upload binaries. Workflow files go through the
   GitHub web UI in the browser; repo creation goes through the signed-in

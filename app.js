@@ -97,6 +97,15 @@
     if (stored !== null && stored !== undefined && stored !== '') {
       el.value = stored;
     }
+    // Save what the calculator shows right now (stored value, or the
+    // page default) so the shared model reflects it even before the user
+    // types. Without this the Wealth Report says "no numbers yet" for a
+    // calculator the user only looked at. Empty inputs are left alone:
+    // saving a 0 would wipe a value another calculator already stored
+    // (e.g. the expenses field on passive-income.html has no default).
+    if (el.value !== '' && el.value !== null && el.value !== undefined) {
+      set(key, parseMoney(el.value));
+    }
     el.addEventListener('input', function () {
       set(key, parseMoney(el.value));
       if (onChange) onChange();
