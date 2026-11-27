@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIRE &amp; Freedom Planner — MyMoneyDecoder</title>
+<meta name="description" content="When can I stop working? Lean, Coast, Barista, Traditional, Fat and Income-based FIRE — your number, your earliest age, your gap.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="brand" href="index.html">MyMoney<span>Decoder</span></a>
+      <a class="nav-link" href="assessment.html">Discover Your Profile</a>
+      <a class="nav-link" href="fire.html">FIRE Planner</a>
+      <a class="nav-link" href="passive-income.html">Passive Income</a>
+      <a class="nav-link" href="net-worth.html">Net Worth</a>
+      <a class="nav-link" href="report.html">My Wealth Report</a>
+      <span class="spacer"></span>
+      <button class="consent-pill" data-consent-pill type="button">Remember my inputs</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="kicker" style="margin-top:24px">Pillar 3 · FIRE &amp; Freedom · Calculator 05 · Signature</p>
+  <h1>FIRE &amp; Freedom Planner</h1>
+  <p>When can I stop working? Pick your flavour of freedom — the maths changes with it.</p>
+
+  <div class="calc-steps">
+    <section class="card">
+      <p class="step-label">Step 1 — Your freedom flavour</p>
+      <div class="mode-row" id="mode-row">
+        <button type="button" class="mode-btn" data-mode="lean">Lean FIRE</button>
+        <button type="button" class="mode-btn" data-mode="coast">Coast FIRE</button>
+        <button type="button" class="mode-btn" data-mode="barista">Barista FIRE</button>
+        <button type="button" class="mode-btn active" data-mode="traditional">Traditional FIRE</button>
+        <button type="button" class="mode-btn" data-mode="fat">Fat FIRE</button>
+        <button type="button" class="mode-btn" data-mode="income">Income-based FIRE</button>
+      </div>
+      <p class="small" id="mode-desc">Traditional FIRE: your portfolio covers your full current spending, at a 4% withdrawal rate.</p>
+
+      <p class="step-label">Step 2 — Your numbers</p>
+      <div class="input-row">
+        <div class="field"><label>Current age</label><input id="in-age" type="number" min="18" max="80" step="1" value="35"></div>
+        <div class="field"><label>Annual expenses (S$) <span class="hint">what your lifestyle costs in a year</span></label><input id="in-expenses" type="number" min="0" step="1000" value="60000"></div>
+      </div>
+      <div class="input-row">
+        <div class="field"><label>Current investable portfolio (S$)</label><input id="in-portfolio" type="number" min="0" step="10000" value="500000"></div>
+        <div class="field"><label>Monthly savings (S$)</label><input id="in-savings" type="number" min="0" step="100" value="3000"></div>
+      </div>
+      <div class="input-row">
+        <div class="field"><label>Expected real return (%/yr) <span class="hint">after inflation</span></label><input id="in-return" type="number" min="-5" max="15" step="0.5" value="5"></div>
+        <div class="field" id="field-target-age" hidden><label>Target retirement age <span class="hint">for Coast FIRE</span></label><input id="in-target-age" type="number" min="30" max="80" step="1" value="60"></div>
+        <div class="field" id="field-parttime" hidden><label>Part-time income (S$/mo) <span class="hint">for Barista FIRE</span></label><input id="in-parttime" type="number" min="0" step="100" value="2000"></div>
+        <div class="field" id="field-target-income" hidden><label>Target monthly passive income (S$) <span class="hint">for Income-based FIRE</span></label><input id="in-target-income" type="number" min="0" step="500" value="5000"></div>
+      </div>
+      <button class="advanced-toggle" id="adv-toggle" type="button">+ Advanced assumptions</button>
+      <div id="advanced" hidden>
+        <div class="input-row">
+          <div class="field"><label>Withdrawal rate (%) <span class="hint">the 4% rule is the default</span></label><input id="in-wr" type="number" min="1" max="10" step="0.25" value="4"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="step-label">Step 3 — Your results</p>
+      <p class="small">Your FIRE number</p>
+      <p class="big-number" id="out-fire-number">—</p>
+      <div class="result-grid" style="margin-top:14px">
+        <div class="stat"><div class="k">Earliest FIRE age</div><div class="v" id="out-fire-age">—</div></div>
+        <div class="stat"><div class="k">Freedom gap</div><div class="v" id="out-gap">—</div></div>
+        <div class="stat"><div class="k">Passive income coverage</div><div class="v" id="out-coverage">—</div></div>
+        <div class="stat"><div class="k">Portfolio longevity</div><div class="v" id="out-longevity">—</div></div>
+        <div class="stat"><div class="k">Coast number (by target age)</div><div class="v" id="out-coast">—</div></div>
+      </div>
+      <h3>Your path to FIRE</h3>
+      <div id="chart"></div>
+      <p class="chart-note" id="chart-note"></p>
+    </section>
+
+    <section class="card">
+      <p class="step-label">Step 4 — Your wealth insights</p>
+      <div id="insights"></div>
+    </section>
+
+    <section class="card method">
+      <h3>Methodology &amp; assumptions</h3>
+      <p><strong>FIRE number</strong> = annual expenses ÷ withdrawal rate (the 4%
+      rule: 25× annual expenses). <strong>Earliest FIRE age</strong> comes from a
+      year-by-year projection: your portfolio grows at the real return and you
+      add your monthly savings. <strong>Lean</strong> targets 70% of current
+      expenses; <strong>Fat</strong> targets 150%. <strong>Coast FIRE</strong> asks
+      what you need <em>today</em> so compounding alone reaches the FIRE number by
+      your target age, with no further contributions. <strong>Barista FIRE</strong>
+      subtracts part-time income from the expenses the portfolio must cover.
+      <strong>Income-based FIRE</strong> replaces expenses with the monthly passive
+      income you want. <strong>Portfolio longevity</strong> simulates withdrawing
+      your expenses every year from the portfolio at the same return. Returns
+      are assumed constant and after inflation — real markets are lumpier.</p>
+    </section>
+
+    <section class="card">
+      <h3>Your data</h3>
+      <p><span data-consent-state></span></p>
+      <p><button class="btn secondary small" data-consent-pill type="button">Remember my inputs</button>
+      &nbsp; <button class="btn secondary small" data-clear-data type="button">Clear my data</button></p>
+      <p class="small">Next step: <a href="passive-income.html">check whether your portfolio income covers your expenses →</a>
+      or <a href="report.html">see your full Wealth Report →</a></p>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p>MyMoneyDecoder calculators are educational planning tools, not financial, legal or tax advice.</p>
+  </footer>
+</div>
+
+<script src="calculators.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  var mode = 'traditional';
+  var MODE_DESC = {
+    lean: 'Lean FIRE: a simpler lifestyle — your portfolio must cover 70% of current spending.',
+    coast: 'Coast FIRE: you already have enough that compounding alone gets you there by your target age — no more saving required.',
+    barista: 'Barista FIRE: part-time work covers part of your spending, so your portfolio needs to cover less.',
+    traditional: 'Traditional FIRE: your portfolio covers your full current spending, at a 4% withdrawal rate.',
+    fat: 'Fat FIRE: a premium lifestyle — your portfolio must cover 150% of current spending.',
+    income: 'Income-based FIRE: forget expenses — set the monthly passive income you want, and we size the portfolio for it.'
+  };
+  function recalc() {
+    var r = MMD.firePlan({
+      age: MMDApp.readNumber('in-age'),
+      targetAge: MMDApp.readNumber('in-target-age'),
+      annualExpenses: MMDApp.readNumber('in-expenses'),
+      portfolio: MMDApp.readNumber('in-portfolio'),
+      monthlySavings: MMDApp.readNumber('in-savings'),
+      realReturnPct: MMDApp.readNumber('in-return'),
+      withdrawalRatePct: MMDApp.readNumber('in-wr'),
+      mode: mode,
+      partTimeMonthly: MMDApp.readNumber('in-parttime'),
+      targetMonthlyIncome: MMDApp.readNumber('in-target-income')
+    });
+    document.getElementById('out-fire-number').textContent = MMDApp.fmtSGD(r.fireNumber);
+    var ageEl = document.getElementById('out-fire-age');
+    ageEl.textContent = r.fireAge === null ? 'Not on this path' : 'Age ' + r.fireAge + ' (' + r.yearsToFire + ' yrs)';
+    ageEl.className = 'v ' + (r.fireAge !== null ? 'good' : 'bad');
+    document.getElementById('out-gap').textContent = MMDApp.fmtSGD(r.freedomGap);
+    var cov = document.getElementById('out-coverage');
+    cov.textContent = MMDApp.fmtPct(r.coverage, 0);
+    cov.className = 'v ' + (r.coverage >= 1 ? 'good' : '');
+    document.getElementById('out-longevity').textContent = MMDApp.fmtYears(r.longevityYears);
+    document.getElementById('out-coast').textContent = MMDApp.fmtSGD(r.coastNumber);
+    var pts = r.projection.map(function (p) { return { x: p.year, y: p.value }; });
+    MMDApp.lineChart(document.getElementById('chart'), pts, {
+      targetY: r.fireNumber, targetLabel: 'FIRE number ' + MMDApp.fmtSGD(r.fireNumber),
+      xLabelStart: 'Age ' + MMDApp.readNumber('in-age'),
+      xLabelEnd: r.fireAge !== null ? 'Age ' + r.fireAge : ''
+    });
+    document.getElementById('chart-note').textContent =
+      r.fireAge !== null
+        ? 'Portfolio value by year. You cross your FIRE number in ' + r.yearsToFire + ' years.'
+        : 'Portfolio value by year. At this savings rate and return, your portfolio does not reach the FIRE number within 40 years — raise savings, raise returns, or lower the target.';
+    var insights = [];
+    if (r.coverage >= 1) insights.push(['good', 'You are already there: your portfolio at a ' + MMDApp.readNumber('in-wr') + '% withdrawal rate covers your expenses. The question now is preservation, not accumulation.']);
+    else {
+      insights.push(['', 'Your portfolio covers ' + MMDApp.fmtPct(r.coverage, 0) + ' of your expenses today. The freedom gap is ' + MMDApp.fmtSGD(r.freedomGap) + '.']);
+      if (r.fireAge !== null) insights.push(['good', 'At S$' + MMDApp.fmtNum(MMDApp.readNumber('in-savings')) + '/month and ' + MMDApp.readNumber('in-return') + '% real return, you reach FIRE at age ' + r.fireAge + '.']);
+    }
+    if (mode === 'coast') {
+      var have = MMDApp.readNumber('in-portfolio');
+      if (have >= r.coastNumber) insights.push(['good', 'You have already coasted: your ' + MMDApp.fmtSGD(have) + ' exceeds the coast number of ' + MMDApp.fmtSGD(r.coastNumber) + ' — compounding alone gets you to FIRE by age ' + r.targetAge + '.']);
+      else insights.push(['', 'Your coast number is ' + MMDApp.fmtSGD(r.coastNumber) + ' — that is what you need today for compounding alone to reach FIRE by age ' + r.targetAge + '. You are ' + MMDApp.fmtSGD(r.coastNumber - have) + ' short.']);
+    }
+    if (r.longevityYears < 30) insights.push(['warn', 'If you stopped working today, your portfolio would last about ' + r.longevityYears + ' years at current spending — sequence-of-returns risk matters most in the first decade.']);
+    else if (r.longevityYears >= 100) insights.push(['good', 'At this withdrawal rate and return, your portfolio is effectively perpetual — it funds your spending indefinitely.']);
+    document.getElementById('insights').innerHTML = insights.map(function (x) {
+      return '<p class="insight ' + x[0] + '">' + x[1] + '</p>';
+    }).join('');
+  }
+  document.querySelectorAll('#mode-row .mode-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#mode-row .mode-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      mode = btn.getAttribute('data-mode');
+      document.getElementById('mode-desc').textContent = MODE_DESC[mode];
+      document.getElementById('field-target-age').hidden = mode !== 'coast';
+      document.getElementById('field-parttime').hidden = mode !== 'barista';
+      document.getElementById('field-target-income').hidden = mode !== 'income';
+      recalc();
+    });
+  });
+  MMDApp.bindNumber('in-age', 'age', recalc);
+  MMDApp.bindNumber('in-expenses', 'annualExpenses', recalc);
+  MMDApp.bindNumber('in-portfolio', 'portfolioValue', recalc);
+  MMDApp.bindNumber('in-savings', 'monthlySavings', recalc);
+  MMDApp.bindNumber('in-return', 'expectedReturn', recalc);
+  MMDApp.bindNumber('in-target-age', 'targetAge', recalc);
+  MMDApp.bindNumber('in-parttime', 'partTimeMonthly', recalc);
+  MMDApp.bindNumber('in-target-income', 'targetMonthlyIncome', recalc);
+  MMDApp.bindNumber('in-wr', 'withdrawalRate', recalc);
+  document.getElementById('adv-toggle').addEventListener('click', function () {
+    var adv = document.getElementById('advanced');
+    adv.hidden = !adv.hidden;
+    this.textContent = adv.hidden ? '+ Advanced assumptions' : '− Advanced assumptions';
+  });
+  recalc();
+})();
+</script>
+</body>
+</html>

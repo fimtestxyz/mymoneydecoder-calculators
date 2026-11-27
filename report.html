@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Wealth Report — MyMoneyDecoder</title>
+<meta name="description" content="One consolidated picture: assets, income, liabilities, FIRE progress and next steps.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="brand" href="index.html">MyMoney<span>Decoder</span></a>
+      <a class="nav-link" href="assessment.html">Discover Your Profile</a>
+      <a class="nav-link" href="fire.html">FIRE Planner</a>
+      <a class="nav-link" href="passive-income.html">Passive Income</a>
+      <a class="nav-link" href="net-worth.html">Net Worth</a>
+      <a class="nav-link" href="report.html">My Wealth Report</a>
+      <span class="spacer"></span>
+      <button class="consent-pill" data-consent-pill type="button">Remember my inputs</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="kicker" style="margin-top:24px">Connected wealth journey</p>
+  <h1>My Wealth Report</h1>
+  <p>One consolidated picture of your assets, income, liabilities, financial
+    independence progress and next steps — built from the numbers you already
+    entered in the calculators. Nothing new to type.</p>
+
+  <div class="calc-steps">
+    <section class="card report-section">
+      <p class="step-label">Where you stand</p>
+      <h3>Net worth</h3>
+      <div id="nw-body"></div>
+    </section>
+
+    <section class="card report-section">
+      <p class="step-label">What your money earns</p>
+      <h3>Passive income</h3>
+      <div id="pi-body"></div>
+    </section>
+
+    <section class="card report-section">
+      <p class="step-label">When you are free</p>
+      <h3>FIRE progress</h3>
+      <div id="fire-body"></div>
+    </section>
+
+    <section class="card report-section">
+      <p class="step-label">What to do next</p>
+      <h3>Next steps</h3>
+      <div id="next-body"></div>
+      <p style="margin-top:14px"><button class="btn" id="copy-btn" type="button">Copy my summary</button>
+      <span class="small" id="copy-note"></span></p>
+    </section>
+
+    <section class="card">
+      <h3>Your data</h3>
+      <p><span data-consent-state></span></p>
+      <p><button class="btn secondary small" data-consent-pill type="button">Remember my inputs</button>
+      &nbsp; <button class="btn secondary small" data-clear-data type="button">Clear my data</button></p>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p>MyMoneyDecoder calculators are educational planning tools, not financial, legal or tax advice.</p>
+  </footer>
+</div>
+
+<script src="calculators.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  var has = function (k) {
+    var v = MMDApp.get(k, null);
+    return v !== null && v !== undefined && v !== '' && Number(v) > 0;
+  };
+  var summary = [];
+
+  // Net worth
+  if (has('cash') || has('investments') || has('cpf') || has('propertyValue')) {
+    var nw = MMD.netWorth({
+      cash: MMDApp.get('cash', 0), investments: MMDApp.get('investments', 0),
+      cpf: MMDApp.get('cpf', 0), property: MMDApp.get('propertyValue', 0),
+      mortgage: MMDApp.get('mortgage', 0), otherLiabilities: MMDApp.get('otherLiabilities', 0)
+    });
+    document.getElementById('nw-body').innerHTML =
+      '<p class="big-number">' + MMDApp.fmtSGD(nw.total) + ' <small>total net worth</small></p>' +
+      '<div class="result-grid"><div class="stat"><div class="k">Investable</div><div class="v">' + MMDApp.fmtSGD(nw.investable) + '</div></div>' +
+      '<div class="stat"><div class="k">Liquid</div><div class="v">' + MMDApp.fmtSGD(nw.liquid) + '</div></div>' +
+      '<div class="stat"><div class="k">Debt-to-asset</div><div class="v">' + MMDApp.fmtPct(nw.debtToAsset) + '</div></div></div>';
+    summary.push('Net worth: ' + MMDApp.fmtSGD(nw.total) +
+      ' (investable ' + MMDApp.fmtSGD(nw.investable) +
+      ', liquid ' + MMDApp.fmtSGD(nw.liquid) +
+      ', debt-to-asset ' + MMDApp.fmtPct(nw.debtToAsset) + ')');
+  } else {
+    document.getElementById('nw-body').innerHTML =
+      '<p class="empty-note">No net-worth numbers yet.</p><p><a href="net-worth.html">Open the Net Worth Decoder →</a></p>';
+  }
+
+  // Passive income
+  if (has('portfolioValue') && has('dividendYield')) {
+    var pi = MMD.passiveIncome({
+      portfolio: MMDApp.get('portfolioValue', 0),
+      yieldPct: MMDApp.get('dividendYield', 0),
+      rocPct: MMDApp.get('rocPct', 0),
+      reinvestPct: MMDApp.get('reinvestPct', 0),
+      divGrowthPct: MMDApp.get('dividendGrowth', 0),
+      annualExpenses: MMDApp.get('annualExpenses', 0)
+    });
+    var cov = pi.coverage === null ? '—' : MMDApp.fmtPct(pi.coverage, 0);
+    document.getElementById('pi-body').innerHTML =
+      '<p class="big-number">' + MMDApp.fmtSGD(pi.genuineMonthly) + ' <small>genuine monthly income</small></p>' +
+      '<div class="result-grid"><div class="stat"><div class="k">Annual distributions</div><div class="v">' + MMDApp.fmtSGD(pi.annualDist) + '</div></div>' +
+      '<div class="stat"><div class="k">Genuine annual income</div><div class="v">' + MMDApp.fmtSGD(pi.genuineAnnual) + '</div></div>' +
+      '<div class="stat"><div class="k">Covers expenses</div><div class="v">' + cov + '</div></div></div>';
+    summary.push('Passive income: ' + MMDApp.fmtSGD(pi.genuineMonthly) + '/mo genuine (' +
+      MMDApp.fmtSGD(pi.genuineAnnual) + '/yr), covering ' + cov + ' of expenses');
+  } else {
+    document.getElementById('pi-body').innerHTML =
+      '<p class="empty-note">No portfolio numbers yet.</p><p><a href="passive-income.html">Open the Passive Income Calculator →</a></p>';
+  }
+
+  // FIRE progress
+  if (has('annualExpenses') && has('portfolioValue')) {
+    var f = MMD.firePlan({
+      age: MMDApp.get('age', 35),
+      annualExpenses: MMDApp.get('annualExpenses', 0),
+      portfolio: MMDApp.get('portfolioValue', 0),
+      monthlySavings: MMDApp.get('monthlySavings', 0),
+      realReturnPct: MMDApp.get('expectedReturn', 5),
+      withdrawalRatePct: MMDApp.get('withdrawalRate', 4),
+      mode: 'traditional'
+    });
+    var pctThere = f.fireNumber > 0 ? f.coverage : 0;
+    document.getElementById('fire-body').innerHTML =
+      '<p class="big-number">' + MMDApp.fmtSGD(f.fireNumber) + ' <small>your FIRE number</small></p>' +
+      '<div class="result-grid"><div class="stat"><div class="k">There today</div><div class="v">' + MMDApp.fmtPct(pctThere, 0) + '</div></div>' +
+      '<div class="stat"><div class="k">Earliest FIRE age</div><div class="v">' + (f.fireAge === null ? 'Not on this path' : 'Age ' + f.fireAge) + '</div></div>' +
+      '<div class="stat"><div class="k">Freedom gap</div><div class="v">' + MMDApp.fmtSGD(f.freedomGap) + '</div></div></div>';
+    summary.push('FIRE number: ' + MMDApp.fmtSGD(f.fireNumber) + ' — ' +
+      MMDApp.fmtPct(pctThere, 0) + ' there, earliest age ' +
+      (f.fireAge === null ? 'not on current path' : f.fireAge) +
+      ', gap ' + MMDApp.fmtSGD(f.freedomGap));
+  } else {
+    document.getElementById('fire-body').innerHTML =
+      '<p class="empty-note">No FIRE numbers yet — expenses and portfolio are needed.</p><p><a href="fire.html">Open the FIRE &amp; Freedom Planner →</a></p>';
+  }
+
+  // Next steps
+  var next = [];
+  if (!has('cash') && !has('investments')) next.push('Start with the <a href="net-worth.html">Net Worth Decoder</a> — know where you stand first.');
+  else if (!has('portfolioValue') || !has('dividendYield')) next.push('Run the <a href="passive-income.html">Passive Income Calculator</a> to see what your investments pay you.');
+  else if (!has('annualExpenses')) next.push('Open the <a href="fire.html">FIRE Planner</a> and enter your annual expenses to find your FIRE number.');
+  else next.push('Your three live calculators are filled in. Next wave: Wealth Compounding, Mortgage vs Invest, and Career Freedom.');
+  next.push('Take the <a href="assessment.html">Wealth Profile Assessment</a> any time your situation changes — it re-ranks the tools for you.');
+  document.getElementById('next-body').innerHTML = next.map(function (n) {
+    return '<p class="insight">' + n + '</p>';
+  }).join('');
+
+  document.getElementById('copy-btn').addEventListener('click', function () {
+    var text = 'MyMoneyDecoder — My Wealth Report\n' + summary.join('\n');
+    var done = function () { document.getElementById('copy-note').textContent = 'Copied.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () {
+        document.getElementById('copy-note').textContent = 'Copy failed — select the text manually.';
+      });
+    } else {
+      document.getElementById('copy-note').textContent = 'Clipboard not available in this browser.';
+    }
+  });
+})();
+</script>
+</body>
+</html>

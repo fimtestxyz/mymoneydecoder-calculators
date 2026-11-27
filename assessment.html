@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discover Your Wealth Profile — MyMoneyDecoder</title>
+<meta name="description" content="Five questions. Your wealth profile, and the three calculators most relevant to you.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="brand" href="index.html">MyMoney<span>Decoder</span></a>
+      <a class="nav-link" href="assessment.html">Discover Your Profile</a>
+      <a class="nav-link" href="fire.html">FIRE Planner</a>
+      <a class="nav-link" href="passive-income.html">Passive Income</a>
+      <a class="nav-link" href="net-worth.html">Net Worth</a>
+      <a class="nav-link" href="report.html">My Wealth Report</a>
+      <span class="spacer"></span>
+      <button class="consent-pill" data-consent-pill type="button">Remember my inputs</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="quiz" class="q-card">
+    <p class="kicker" style="margin-top:24px">Signature experience</p>
+    <h1>Discover Your Wealth Profile</h1>
+    <p>Where are you in your financial journey? Five questions — no exact
+      account balances needed — and we recommend the three calculators most
+      relevant to your situation.</p>
+    <div class="progress"><div id="progress-bar" style="width:0%"></div></div>
+    <div id="question-box"></div>
+  </div>
+
+  <div id="result" hidden>
+    <p class="kicker" style="margin-top:24px">Your recommended wealth tools</p>
+    <p class="small">Illustrative profile — a starting point, not a verdict.</p>
+    <h1 class="persona-name" id="persona-name"></h1>
+    <p id="persona-tagline"></p>
+    <p><em id="persona-question"></em></p>
+    <h2>Your three calculators</h2>
+    <div class="grid cols-3" id="rec-list"></div>
+    <div class="card" style="margin-top:16px">
+      <h3>Your next financial milestone</h3>
+      <p id="milestone"></p>
+    </div>
+    <p style="margin-top:16px">
+      <button class="btn secondary" id="retake" type="button">Retake the assessment</button>
+      &nbsp; <a class="btn" href="report.html">See My Wealth Report →</a>
+    </p>
+  </div>
+
+  <footer class="site-footer">
+    <p>MyMoneyDecoder calculators are educational planning tools, not financial, legal or tax advice.</p>
+  </footer>
+</div>
+
+<script src="calculators.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  var QUESTIONS = [
+    { key: 'ageGroup', title: 'What is your age group?', options: [
+      ['under-30', 'Below 30'], ['30-39', '30–39'], ['40-49', '40–49'],
+      ['50-59', '50–59'], ['60-plus', '60 and above'] ] },
+    { key: 'netWorthBand', title: 'Approximately how much is your net worth?', options: [
+      ['under-100k', 'Below S$100k'], ['100k-500k', 'S$100k–500k'],
+      ['500k-1m', 'S$500k–1M'], ['1m-3m', 'S$1M–3M'], ['3m-5m', 'S$3M–5M'],
+      ['over-5m', 'Above S$5M'], ['prefer-not-to-say', 'Prefer not to disclose'] ] },
+    { key: 'incomeSource', title: 'What is your main income source?', options: [
+      ['salary', 'Salary'], ['business', 'Business income'],
+      ['salary-investment', 'Salary + investment income'],
+      ['investment', 'Investment / passive income'], ['retirement', 'Retirement income'] ] },
+    { key: 'goal', title: 'What is your biggest financial goal?', options: [
+      ['first-million', 'Build my first million'],
+      ['grow-optimise', 'Grow and optimise my wealth'],
+      ['financial-independence', 'Achieve financial independence'],
+      ['retire-comfortably', 'Retire comfortably'],
+      ['preserve-transfer', 'Preserve and transfer my wealth'],
+      ['career-freedom', 'Have more freedom over my career and lifestyle'] ] },
+    { key: 'stage', title: 'Where would you describe yourself today?', options: [
+      ['building', 'Building my financial foundation'],
+      ['growing', 'Growing my wealth'],
+      ['optimising', 'Optimising my wealth'],
+      ['preparing-retirement', 'Preparing for retirement'],
+      ['independent', 'Already financially independent'] ] },
+  ];
+  var answers = {};
+  var step = 0;
+  var box = document.getElementById('question-box');
+  var bar = document.getElementById('progress-bar');
+
+  function render() {
+    var q = QUESTIONS[step];
+    bar.style.width = Math.round((step / QUESTIONS.length) * 100) + '%';
+    var html = '<h2>Question ' + (step + 1) + ' of ' + QUESTIONS.length +
+      ' — ' + q.title + '</h2><div class="q-options">';
+    q.options.forEach(function (opt) {
+      var sel = answers[q.key] === opt[0] ? ' selected' : '';
+      html += '<button type="button" class="q-opt' + sel + '" data-value="' +
+        opt[0] + '">' + opt[1] + '</button>';
+    });
+    html += '</div>';
+    if (step > 0) html += '<button type="button" class="btn secondary small" id="back-btn">← Back</button>';
+    box.innerHTML = html;
+    box.querySelectorAll('.q-opt').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        answers[q.key] = btn.getAttribute('data-value');
+        if (step < QUESTIONS.length - 1) { step++; render(); }
+        else showResult();
+      });
+    });
+    var back = document.getElementById('back-btn');
+    if (back) back.addEventListener('click', function () { step--; render(); });
+  }
+
+  function showResult() {
+    bar.style.width = '100%';
+    var r = MMD.assessProfile(answers);
+    document.getElementById('quiz').hidden = true;
+    document.getElementById('result').hidden = false;
+    document.getElementById('persona-name').textContent = 'Your profile: ' + r.persona.name;
+    document.getElementById('persona-tagline').textContent = r.persona.tagline;
+    document.getElementById('persona-question').textContent = r.persona.question;
+    document.getElementById('milestone').textContent = r.milestone;
+    document.getElementById('rec-list').innerHTML = r.recommendations.map(function (c) {
+      var badge = c.live
+        ? '<span class="badge live">Live — try now</span>'
+        : '<span class="badge soon">Coming soon</span>';
+      var link = c.live ? '<p><a href="' + c.url + '">Open →</a></p>' : '';
+      return '<div class="card rec-card"><span class="pillar-tag">Pillar ' + c.pillar +
+        '</span><h3>' + c.title + '</h3>' + badge + link + '</div>';
+    }).join('');
+    document.getElementById('retake').addEventListener('click', function () {
+      answers = {}; step = 0;
+      document.getElementById('result').hidden = true;
+      document.getElementById('quiz').hidden = false;
+      render();
+    });
+    window.scrollTo(0, 0);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

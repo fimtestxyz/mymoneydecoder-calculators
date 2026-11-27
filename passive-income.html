@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Passive Income &amp; Dividend Calculator — MyMoneyDecoder</title>
+<meta name="description" content="Can your investments generate the income you need? Genuine dividends versus return of capital, reinvestment, coverage.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="brand" href="index.html">MyMoney<span>Decoder</span></a>
+      <a class="nav-link" href="assessment.html">Discover Your Profile</a>
+      <a class="nav-link" href="fire.html">FIRE Planner</a>
+      <a class="nav-link" href="passive-income.html">Passive Income</a>
+      <a class="nav-link" href="net-worth.html">Net Worth</a>
+      <a class="nav-link" href="report.html">My Wealth Report</a>
+      <span class="spacer"></span>
+      <button class="consent-pill" data-consent-pill type="button">Remember my inputs</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="kicker" style="margin-top:24px">Pillar 2 · Wealth Building · Calculator 04</p>
+  <h1>Passive Income &amp; Dividend Calculator</h1>
+  <p>Can your investments generate the income you need? Start with the worked
+    example — S$2,000,000 at 8.0% — then put in your own numbers.</p>
+
+  <div class="calc-steps">
+    <section class="card">
+      <p class="step-label">Step 1 — Your portfolio</p>
+      <div class="input-row">
+        <div class="field"><label>Portfolio value (S$)</label><input id="in-portfolio" type="number" min="0" step="10000" value="2000000"></div>
+        <div class="field"><label>Expected annual distribution yield (%) <span class="hint">cash paid out per year, as % of portfolio</span></label><input id="in-yield" type="number" min="0" max="30" step="0.1" value="8"></div>
+      </div>
+      <p class="step-label">Step 2 — Your income assumptions</p>
+      <div class="input-row">
+        <div class="field"><label>Return of capital (%) <span class="hint">share of distributions that is your own capital coming back, not genuine income</span></label><input id="in-roc" type="number" min="0" max="100" step="1" value="0"></div>
+        <div class="field"><label>Reinvestment (%) <span class="hint">share of distributions you reinvest instead of spending</span></label><input id="in-reinvest" type="number" min="0" max="100" step="5" value="0"></div>
+      </div>
+      <button class="advanced-toggle" id="adv-toggle" type="button">+ Advanced assumptions</button>
+      <div id="advanced" hidden>
+        <div class="input-row">
+          <div class="field"><label>Expected dividend growth (%/yr)</label><input id="in-growth" type="number" min="-10" max="20" step="0.5" value="2"></div>
+          <div class="field"><label>Annual expenses (S$) <span class="hint">for income coverage — shared with the FIRE Planner</span></label><input id="in-expenses" type="number" min="0" step="1000" placeholder="e.g. 60000"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="step-label">Step 3 — Your results</p>
+      <div class="result-grid">
+        <div class="stat"><div class="k">Annual distributions</div><div class="v" id="out-annual">—</div></div>
+        <div class="stat"><div class="k">Monthly distributions</div><div class="v" id="out-monthly">—</div></div>
+        <div class="stat"><div class="k">Genuine annual income</div><div class="v good" id="out-genuine">—</div></div>
+        <div class="stat"><div class="k">Genuine monthly income</div><div class="v good" id="out-genuine-mo">—</div></div>
+        <div class="stat"><div class="k">Income coverage of expenses</div><div class="v" id="out-coverage">—</div></div>
+      </div>
+      <h3>10-year reinvestment projection</h3>
+      <div id="projection-bars"></div>
+      <p class="chart-note">Portfolio value at each year-end, with reinvested distributions and dividend growth applied.</p>
+    </section>
+
+    <section class="card">
+      <p class="step-label">Step 4 — Your wealth insights</p>
+      <div id="insights"></div>
+    </section>
+
+    <section class="card method">
+      <h3>Methodology &amp; assumptions</h3>
+      <p><strong>Annual distributions</strong> = portfolio × yield.
+      <strong>Genuine income</strong> = distributions × (1 − return-of-capital %):
+      return of capital is your own money coming back, not profit.
+      <strong>Coverage</strong> = genuine annual income ÷ annual expenses.
+      The projection grows the portfolio by dividend growth each year, adds
+      reinvested distributions, and subtracts the return-of-capital share that
+      is spent rather than reinvested. Yield, growth and ROC are assumed
+      constant — in reality all three move around.</p>
+    </section>
+
+    <section class="card">
+      <h3>Your data</h3>
+      <p><span data-consent-state></span></p>
+      <p><button class="btn secondary small" data-consent-pill type="button">Remember my inputs</button>
+      &nbsp; <button class="btn secondary small" data-clear-data type="button">Clear my data</button></p>
+      <p class="small">Next step: <a href="fire.html">see when this income can replace your salary →</a></p>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p>MyMoneyDecoder calculators are educational planning tools, not financial, legal or tax advice. Illustrative only, before separating return of capital.</p>
+  </footer>
+</div>
+
+<script src="calculators.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  function recalc() {
+    var r = MMD.passiveIncome({
+      portfolio: MMDApp.readNumber('in-portfolio'),
+      yieldPct: MMDApp.readNumber('in-yield'),
+      rocPct: MMDApp.readNumber('in-roc'),
+      reinvestPct: MMDApp.readNumber('in-reinvest'),
+      divGrowthPct: MMDApp.readNumber('in-growth'),
+      annualExpenses: MMDApp.readNumber('in-expenses')
+    });
+    document.getElementById('out-annual').textContent = MMDApp.fmtSGD(r.annualDist);
+    document.getElementById('out-monthly').textContent = MMDApp.fmtSGD(r.monthlyDist);
+    document.getElementById('out-genuine').textContent = MMDApp.fmtSGD(r.genuineAnnual);
+    document.getElementById('out-genuine-mo').textContent = MMDApp.fmtSGD(r.genuineMonthly);
+    var cov = document.getElementById('out-coverage');
+    cov.textContent = r.coverage === null ? 'Enter expenses' : MMDApp.fmtPct(r.coverage, 0);
+    cov.className = 'v ' + (r.coverage === null ? '' : r.coverage >= 1 ? 'good' : 'bad');
+    MMDApp.barRows(document.getElementById('projection-bars'),
+      r.projection.map(function (p) {
+        return { label: 'Year ' + p.year, value: p.portfolio,
+          text: MMDApp.fmtSGD(p.portfolio), cls: 'green' };
+      }));
+    var insights = [];
+    if (MMDApp.readNumber('in-roc') > 0) {
+      insights.push(['warn', 'With ' + MMDApp.readNumber('in-roc') + '% return of capital, ' +
+        MMDApp.fmtSGD(r.annualDist - r.genuineAnnual) + ' of your ' + MMDApp.fmtSGD(r.annualDist) +
+        ' yearly payout is your own capital coming back — spend it and your portfolio shrinks.']);
+    } else {
+      insights.push(['good', 'At 0% return of capital, the full distribution counts as genuine income. Check your fund documents — many high-yield payouts quietly include ROC.']);
+    }
+    if (r.coverage !== null) {
+      if (r.coverage >= 1) insights.push(['good', 'Your genuine income covers ' + MMDApp.fmtPct(r.coverage, 0) + ' of your annual expenses — your portfolio already pays for your lifestyle.']);
+      else insights.push(['', 'Your genuine income covers ' + MMDApp.fmtPct(r.coverage, 0) + ' of your annual expenses. The gap is ' + MMDApp.fmtSGD(MMDApp.readNumber('in-expenses') - r.genuineAnnual) + ' a year — the FIRE Planner shows when it closes.']);
+    }
+    if (r.sustainable) insights.push(['good', 'Capital is sustainable at these settings: growth plus reinvestment covers the return-of-capital drain.']);
+    else insights.push(['warn', 'Capital is not sustainable at these settings: it halves in about ' + r.yearsToHalve.toFixed(0) + ' years. Raise reinvestment, lower the ROC share, or accept a smaller payout.']);
+    if (MMDApp.readNumber('in-yield') > 10) insights.push(['warn', 'A yield above 10% is unusually high — verify how much of it is genuine income versus return of capital before counting on it.']);
+    document.getElementById('insights').innerHTML = insights.map(function (x) {
+      return '<p class="insight ' + x[0] + '">' + x[1] + '</p>';
+    }).join('');
+  }
+  MMDApp.bindNumber('in-portfolio', 'portfolioValue', recalc);
+  MMDApp.bindNumber('in-yield', 'dividendYield', recalc);
+  MMDApp.bindNumber('in-roc', 'rocPct', recalc);
+  MMDApp.bindNumber('in-reinvest', 'reinvestPct', recalc);
+  MMDApp.bindNumber('in-growth', 'dividendGrowth', recalc);
+  MMDApp.bindNumber('in-expenses', 'annualExpenses', recalc);
+  document.getElementById('adv-toggle').addEventListener('click', function () {
+    var adv = document.getElementById('advanced');
+    adv.hidden = !adv.hidden;
+    this.textContent = adv.hidden ? '+ Advanced assumptions' : '− Advanced assumptions';
+  });
+  recalc();
+})();
+</script>
+</body>
+</html>

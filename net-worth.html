@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Net Worth Decoder — MyMoneyDecoder</title>
+<meta name="description" content="Who is financially healthy, and where does their wealth sit? Total, investable and liquid net worth.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="brand" href="index.html">MyMoney<span>Decoder</span></a>
+      <a class="nav-link" href="assessment.html">Discover Your Profile</a>
+      <a class="nav-link" href="fire.html">FIRE Planner</a>
+      <a class="nav-link" href="passive-income.html">Passive Income</a>
+      <a class="nav-link" href="net-worth.html">Net Worth</a>
+      <a class="nav-link" href="report.html">My Wealth Report</a>
+      <span class="spacer"></span>
+      <button class="consent-pill" data-consent-pill type="button">Remember my inputs</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="kicker" style="margin-top:24px">Pillar 1 · Wealth Foundations · Calculator 01</p>
+  <h1>Net Worth Decoder</h1>
+  <p>Who is financially healthy, and where does their wealth sit? Enter what you
+    own and owe — no account connection needed.</p>
+
+  <div class="calc-steps">
+    <section class="card">
+      <p class="step-label">Step 1 — Your assets &amp; liabilities</p>
+      <div class="input-row">
+        <div class="field"><label>Cash and deposits (S$)</label><input id="in-cash" type="number" min="0" step="1000" placeholder="e.g. 50000"></div>
+        <div class="field"><label>Stocks, ETFs, bonds &amp; funds (S$)</label><input id="in-investments" type="number" min="0" step="1000" placeholder="e.g. 200000"></div>
+      </div>
+      <div class="input-row">
+        <div class="field"><label>CPF balances (S$)</label><input id="in-cpf" type="number" min="0" step="1000" placeholder="e.g. 150000"></div>
+        <div class="field"><label>Property value (S$)</label><input id="in-property" type="number" min="0" step="1000" placeholder="e.g. 800000"></div>
+      </div>
+      <div class="input-row">
+        <div class="field"><label>Mortgage outstanding (S$)</label><input id="in-mortgage" type="number" min="0" step="1000" placeholder="e.g. 400000"></div>
+        <div class="field"><label>Other liabilities (S$)</label><input id="in-other" type="number" min="0" step="1000" placeholder="e.g. 20000"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="step-label">Step 2 — Your results</p>
+      <p class="small">Total net worth</p>
+      <p class="big-number" id="out-total">S$0</p>
+      <div class="result-grid" style="margin-top:14px">
+        <div class="stat"><div class="k">Investable net worth</div><div class="v" id="out-investable">S$0</div></div>
+        <div class="stat"><div class="k">Liquid assets</div><div class="v" id="out-liquid">S$0</div></div>
+        <div class="stat"><div class="k">Gross assets</div><div class="v" id="out-gross">S$0</div></div>
+        <div class="stat"><div class="k">Total liabilities</div><div class="v" id="out-liab">S$0</div></div>
+        <div class="stat"><div class="k">Debt-to-asset ratio</div><div class="v" id="out-dta">—</div></div>
+      </div>
+      <h3>Wealth composition</h3>
+      <div id="donut"></div>
+    </section>
+
+    <section class="card">
+      <p class="step-label">Step 3 — Your wealth insights</p>
+      <div id="insights"><p class="empty-note">Enter your assets and liabilities to see insights.</p></div>
+    </section>
+
+    <section class="card method">
+      <h3>Methodology &amp; assumptions</h3>
+      <p><strong>Total net worth</strong> = all assets − all liabilities.
+      <strong>Investable net worth</strong> = cash + stocks, ETFs, bonds and funds —
+      it excludes CPF and property, which are not readily deployable.
+      <strong>Liquid assets</strong> = cash and deposits only.
+      <strong>Debt-to-asset ratio</strong> = liabilities ÷ gross assets.
+      Property is valued at your estimate; CPF at your latest statement balance.
+      Figures are a snapshot, not a valuation.</p>
+    </section>
+
+    <section class="card">
+      <h3>Your data</h3>
+      <p><span data-consent-state></span></p>
+      <p><button class="btn secondary small" data-consent-pill type="button">Remember my inputs</button>
+      &nbsp; <button class="btn secondary small" data-clear-data type="button">Clear my data</button></p>
+      <p class="small">Next step: <a href="passive-income.html">see what income your investments can generate →</a>
+      or <a href="fire.html">find your FIRE number →</a></p>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p>MyMoneyDecoder calculators are educational planning tools, not financial, legal or tax advice.</p>
+  </footer>
+</div>
+
+<script src="calculators.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  function recalc() {
+    var r = MMD.netWorth({
+      cash: MMDApp.readNumber('in-cash'),
+      investments: MMDApp.readNumber('in-investments'),
+      cpf: MMDApp.readNumber('in-cpf'),
+      property: MMDApp.readNumber('in-property'),
+      mortgage: MMDApp.readNumber('in-mortgage'),
+      otherLiabilities: MMDApp.readNumber('in-other')
+    });
+    document.getElementById('out-total').textContent = MMDApp.fmtSGD(r.total);
+    document.getElementById('out-investable').textContent = MMDApp.fmtSGD(r.investable);
+    document.getElementById('out-liquid').textContent = MMDApp.fmtSGD(r.liquid);
+    document.getElementById('out-gross').textContent = MMDApp.fmtSGD(r.grossAssets);
+    document.getElementById('out-liab').textContent = MMDApp.fmtSGD(r.liabilities);
+    var dtaEl = document.getElementById('out-dta');
+    dtaEl.textContent = MMDApp.fmtPct(r.debtToAsset);
+    dtaEl.className = 'v ' + (r.debtToAsset > 0.5 ? 'bad' : r.debtToAsset < 0.3 ? 'good' : '');
+    MMDApp.donut(document.getElementById('donut'), [
+      { label: 'Cash & deposits', value: MMDApp.readNumber('in-cash') },
+      { label: 'Stocks, ETFs, bonds & funds', value: MMDApp.readNumber('in-investments') },
+      { label: 'CPF', value: MMDApp.readNumber('in-cpf') },
+      { label: 'Property', value: MMDApp.readNumber('in-property') }
+    ]);
+    var insights = [];
+    if (r.grossAssets <= 0) {
+      insights.push(['', 'Enter your assets and liabilities to see insights.']);
+    } else {
+      if (r.debtToAsset > 0.5) insights.push(['warn', 'High leverage: more than half your assets are funded by debt. Paying down the mortgage or other loans moves your net worth faster than investing the same dollar.']);
+      else if (r.debtToAsset > 0.3) insights.push(['', 'Moderate leverage: about a third of your assets are debt-funded. Keep an eye on interest costs if rates rise.']);
+      else insights.push(['good', 'Low leverage: under 30% of your assets are debt-funded — your balance sheet can absorb a shock.']);
+      if (r.total > 0) {
+        var invShare = r.investable / r.total;
+        insights.push(['', 'Investable wealth is ' + MMDApp.fmtPct(invShare) + ' of your net worth — this is the part that can actually generate income and compound.']);
+      }
+      if (r.allocation.property > 0.6) insights.push(['warn', 'Property is ' + MMDApp.fmtPct(r.allocation.property) + ' of your gross assets. Your wealth is concentrated in one illiquid asset — diversification is worth a look.']);
+      var monthlyExp = (MMDApp.get('annualExpenses', 0) || 0) / 12;
+      if (monthlyExp > 0 && r.liquid > 0) {
+        var runway = r.liquid / monthlyExp;
+        insights.push(['', 'Your liquid cash covers about ' + runway.toFixed(1) + ' months of spending at your current expense level.']);
+      }
+    }
+    document.getElementById('insights').innerHTML = insights.map(function (x) {
+      return '<p class="insight ' + x[0] + '">' + x[1] + '</p>';
+    }).join('');
+  }
+  ['in-cash', 'in-investments', 'in-cpf', 'in-property', 'in-mortgage', 'in-other']
+    .forEach(function (id, i) {
+      var keys = ['cash', 'investments', 'cpf', 'propertyValue', 'mortgage', 'otherLiabilities'];
+      MMDApp.bindNumber(id, keys[i], recalc);
+    });
+  recalc();
+})();
+</script>
+</body>
+</html>
